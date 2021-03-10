@@ -12,7 +12,7 @@ The NGINX instance will log all availible variables (from here: <http://nginx.or
 * Copy your nginx-repo keys to the nginx-app-protect dir
 * I included certificates to *.nginx.rocks, feel free to replace them with your own.
 * Bring up with `./run.sh`
-* the default login is elastic/yourpasswordhere
+* The default login is elastic/yourpasswordhere
 * Import the Kibana Dashboard file if desired
 
 
