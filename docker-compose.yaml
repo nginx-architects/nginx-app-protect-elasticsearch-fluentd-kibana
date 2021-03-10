@@ -4,6 +4,8 @@ services:
   fluentd:
     build: fluentd
     container_name: fluentd
+    extra_hosts:
+      - "es.nginx.rocks:10.0.1.82"    
     volumes:
       - $PWD/fluentd/fluent-app-protect.conf:/fluentd/etc/fluent.conf
       - $PWD/logs/nginx/:/var/log/nginx/
@@ -30,12 +32,14 @@ services:
     container_name: kibana
     ports:
       - 5601:5601
+    extra_hosts:
+      - "es.nginx.rocks:10.0.1.82"
     environment:
-      SERVER_NAME: elk.nginx.rocks
-      ELASTICSEARCH_URL: https://elk.nginx.rocks:9200
-      ELASTICSEARCH_HOSTS: https://elk.nginx.rocks:9200
+      SERVER_NAME: kibana.nginx.rocks
+      ELASTICSEARCH_URL: https://es.nginx.rocks:9200
+      ELASTICSEARCH_HOSTS: https://es.nginx.rocks:9200
       ELASTICSEARCH_USERNAME: elastic
-      ELASTICSEARCH_PASSWORD: sfghgs45yfsh7xfnhp9
+      ELASTICSEARCH_PASSWORD: yourpasswordhere
       SERVER_SSL_ENABLED: "true"
       SERVER_SSL_KEY: "/certs/privkey.pem"
       SERVER_SSL_CERTIFICATE: "/certs/fullchain.pem"
@@ -45,10 +49,13 @@ services:
   elasticsearch:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
+    extra_hosts:
+      - "es.nginx.rocks:10.0.1.82"    
+
     environment:
-      - node.name=elasticsearch
-      - discovery.seed_hosts=elasticsearch
-      - cluster.initial_master_nodes=elasticsearch
+      - node.name=es.nginx.rocks
+      - discovery.seed_hosts=es.nginx.rocks
+      - cluster.initial_master_nodes=es.nginx.rocks
       - ELASTIC_PASSWORD=yourpasswordhere
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.license.self_generated.type=trial
