@@ -11,7 +11,7 @@ The NGINX instance will log all availible variables (from here: <http://nginx.or
 * The app-protect host listening on 80 and 443 automatically redirects to kibana and logs that traffic to elastic
 * Copy your nginx-repo keys to the nginx-app-protect dir
 * I included certificates to *.nginx.rocks, feel free to replace them with your own.
-* Bring up with `./run.sh`
+* Bring up with `docker-compose up --build`
 * The default login is elastic/yourpasswordhere
 * Import the Kibana Dashboard file if desired
 
