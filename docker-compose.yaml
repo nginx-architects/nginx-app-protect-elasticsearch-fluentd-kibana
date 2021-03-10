@@ -49,7 +49,7 @@ services:
       - node.name=elasticsearch
       - discovery.seed_hosts=elasticsearch
       - cluster.initial_master_nodes=elasticsearch
-      - ELASTIC_PASSWORD=sfghgs45yfsh7xfnhp9
+      - ELASTIC_PASSWORD=yourpasswordhere
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.license.self_generated.type=trial
       - xpack.security.enabled=true
