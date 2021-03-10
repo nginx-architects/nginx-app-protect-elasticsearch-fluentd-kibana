@@ -1,3 +1,5 @@
 nginx-repo.*
 *.log
-*.json
+compile_error_msg.json
+app_protect.log
+access.json
