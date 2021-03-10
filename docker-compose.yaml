@@ -1,0 +1,80 @@
+version: '2.2'
+services:
+
+  fluentd:
+    build: fluentd
+    container_name: fluentd
+    volumes:
+      - $PWD/fluentd/fluent-app-protect.conf:/fluentd/etc/fluent.conf
+      - $PWD/logs/nginx/:/var/log/nginx/
+      - $PWD/logs/app_protect/:/var/log/app_protect/
+    
+  nginx-app-protect:
+    container_name: nginx-app-protect
+    hostname: nginx-app-protect
+    build: nginx-app-protect
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - $PWD/nginx-app-protect/etc/nginx/conf.d/:/etc/nginx/conf.d/
+      - $PWD/nginx-app-protect/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - $PWD/nginx-app-protect/etc/nginx/custom_log_format.json:/etc/nginx/custom_log_format.json
+      - $PWD/nginx-app-protect/etc/nginx/all-log-vars.conf:/etc/nginx/all-log-vars.conf
+      - $PWD/logs/nginx/:/var/log/nginx/
+      - $PWD/logs/app_protect/:/var/log/app_protect/
+      - $PWD/certs/:/certs/
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.11.1
+    container_name: kibana
+    ports:
+      - 5601:5601
+    environment:
+      SERVER_NAME: elk.nginx.rocks
+      ELASTICSEARCH_URL: https://elk.nginx.rocks:9200
+      ELASTICSEARCH_HOSTS: https://elk.nginx.rocks:9200
+      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_PASSWORD: sfghgs45yfsh7xfnhp9
+      SERVER_SSL_ENABLED: "true"
+      SERVER_SSL_KEY: "/certs/privkey.pem"
+      SERVER_SSL_CERTIFICATE: "/certs/fullchain.pem"
+    volumes:
+      - $PWD/certs/:/certs/
+
+  elasticsearch:
+    container_name: elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
+    environment:
+      - node.name=elasticsearch
+      - discovery.seed_hosts=elasticsearch
+      - cluster.initial_master_nodes=elasticsearch
+      - ELASTIC_PASSWORD=sfghgs45yfsh7xfnhp9
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.license.self_generated.type=trial
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=/usr/share/elasticsearch/config/certificates/privkey.pem
+      - xpack.security.http.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/chain.pem
+      - xpack.security.http.ssl.certificate=/usr/share/elasticsearch/config/certificates/fullchain.pem
+      - xpack.security.transport.ssl.enabled=true
+      - xpack.security.transport.ssl.verification_mode=certificate
+      - xpack.security.transport.ssl.certificate_authorities=/usr/share/elasticsearch/config/certificates/chain.pem
+      - xpack.security.transport.ssl.certificate=/usr/share/elasticsearch/config/certificates/fullchain.pem
+      - xpack.security.transport.ssl.key=/usr/share/elasticsearch/config/certificates/privkey.pem
+    volumes:
+      - elk-data:/usr/share/elasticsearch/data
+      - $PWD/certs/:/usr/share/elasticsearch/config/certificates/
+    ports:
+      - 9200:9200
+    healthcheck:
+      test: curl --cacert /usr/share/elasticsearch/config/certificates/chain.pem -s https://localhost:9200 >/dev/null; if [[ $$? == 52 ]]; then echo 0; else echo 1; fi
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  wait_until_ready:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
+    command: /usr/bin/true
+    depends_on: {"elasticsearch": {"condition": "service_healthy"}}
+
+volumes: {"elk-data"}
