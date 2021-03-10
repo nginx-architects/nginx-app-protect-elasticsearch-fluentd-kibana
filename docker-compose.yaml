@@ -5,7 +5,7 @@ services:
     build: fluentd
     container_name: fluentd
     extra_hosts:
-      - "es.nginx.rocks:10.0.1.82"    
+      - "es.nginx.rocks:10.0.1.66"    
     volumes:
       - $PWD/fluentd/fluent-app-protect.conf:/fluentd/etc/fluent.conf
       - $PWD/logs/nginx/:/var/log/nginx/
@@ -13,7 +13,8 @@ services:
     
   nginx-app-protect:
     container_name: nginx-app-protect
-    hostname: nginx-app-protect
+    # if you already have a built image, save time and use it instead
+    # image: registry.domain.com/nginx-app-protect:latest
     build: nginx-app-protect
     ports:
       - "80:80"
@@ -33,7 +34,7 @@ services:
     ports:
       - 5601:5601
     extra_hosts:
-      - "es.nginx.rocks:10.0.1.82"
+      - "es.nginx.rocks:10.0.1.66"
     environment:
       SERVER_NAME: kibana.nginx.rocks
       ELASTICSEARCH_URL: https://es.nginx.rocks:9200
@@ -50,7 +51,7 @@ services:
     container_name: elasticsearch
     image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
     extra_hosts:
-      - "es.nginx.rocks:10.0.1.82"    
+      - "es.nginx.rocks:10.0.1.66"    
 
     environment:
       - node.name=es.nginx.rocks

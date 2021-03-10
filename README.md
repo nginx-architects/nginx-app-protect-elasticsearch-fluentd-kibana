@@ -9,7 +9,7 @@ The NGINX instance will log all availible variables (from here: <http://nginx.or
 * Copy nginx plus keys to nginx-app-protect dir
 * make sure to do a find all on the current password in the docker-compose file and replace
 * The app-protect host listening on 80 and 443 automatically redirects to kibana and logs that traffic to elastic
-* Copy your nginx-repo keys to the nginx-app-protect dir
+* Either copy your nginx-repo keys to the nginx-app-protect dir or change the build to your image in the docker-compose
 * I included certificates to *.nginx.rocks, feel free to replace them with your own.
 * Update the IP the line `- "es.nginx.rocks:10.0.1.82"` with your host's IP (not 127.0.0.1)
 * Bring up with `docker-compose up --build`
