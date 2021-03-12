@@ -1,7 +1,7 @@
 # For Debian 10:
 FROM debian:buster
-RUN groupadd -r nginx \
-  && useradd -r -g nginx nginx 
+#RUN groupadd -r nginx \
+#  && useradd -r -g nginx nginx 
 
 # Download certificate and key from the customer portal (https://my.f5.com)
 # and copy to the build context:
@@ -23,7 +23,7 @@ RUN wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90nginx \
  && wget -P /etc/apt/apt.conf.d https://cs.nginx.com/static/files/90app-protect-security-updates
     
 # Update the repository and install the most recent version of the NGINX App Protect package (which includes NGINX Plus):
-RUN apt-get update && apt-get install -y nginx-plus \
+RUN apt-get update  \
  && apt-get install -y app-protect app-protect-attack-signatures app-protect-threat-campaigns
 
 # Remove nginx repository key/cert from docker

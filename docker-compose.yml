@@ -5,20 +5,22 @@ services:
     build: fluentd
     container_name: fluentd
     extra_hosts:
-      - "es.nginx.rocks:10.0.1.66"    
+      - "es.${DOMAIN_NAME}:${LOCAL_IP}"
     volumes:
       - $PWD/fluentd/fluent-app-protect.conf:/fluentd/etc/fluent.conf
       - $PWD/logs/nginx/:/var/log/nginx/
       - $PWD/logs/app_protect/:/var/log/app_protect/
-    
+    depends_on: ['elasticsearch']
+
   nginx-app-protect:
     container_name: nginx-app-protect
     # if you already have a built image, save time and use it instead
-    # image: registry.domain.com/nginx-app-protect:latest
-    build: nginx-app-protect
+    image: registry.nginx.rocks/nap:test
+    #uild: nginx-app-protect
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
       - $PWD/nginx-app-protect/etc/nginx/conf.d/:/etc/nginx/conf.d/
       - $PWD/nginx-app-protect/etc/nginx/nginx.conf:/etc/nginx/nginx.conf
@@ -27,37 +29,39 @@ services:
       - $PWD/logs/nginx/:/var/log/nginx/
       - $PWD/logs/app_protect/:/var/log/app_protect/
       - $PWD/certs/:/certs/
+    depends_on: ['kibana']
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.11.1
+    image: docker.elastic.co/kibana/kibana:${ELASTIC_VERSION}
     container_name: kibana
     ports:
       - 5601:5601
     extra_hosts:
-      - "es.nginx.rocks:10.0.1.66"
+      - "es.${DOMAIN_NAME}:${LOCAL_IP}"
     environment:
-      SERVER_NAME: kibana.nginx.rocks
-      ELASTICSEARCH_URL: https://es.nginx.rocks:9200
-      ELASTICSEARCH_HOSTS: https://es.nginx.rocks:9200
+      SERVER_NAME: kibana
+      ELASTICSEARCH_URL: https://es.${DOMAIN_NAME}:9200
+      ELASTICSEARCH_HOSTS: https://es.${DOMAIN_NAME}:9200
       ELASTICSEARCH_USERNAME: elastic
-      ELASTICSEARCH_PASSWORD: yourpasswordhere
+      ELASTICSEARCH_PASSWORD: ${PASSWORD}
       SERVER_SSL_ENABLED: "true"
       SERVER_SSL_KEY: "/certs/privkey.pem"
       SERVER_SSL_CERTIFICATE: "/certs/fullchain.pem"
     volumes:
       - $PWD/certs/:/certs/
+    depends_on: ['elasticsearch']
 
   elasticsearch:
     container_name: elasticsearch
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:${ELASTIC_VERSION}
     extra_hosts:
-      - "es.nginx.rocks:10.0.1.66"    
+      - "es.${DOMAIN_NAME}:${LOCAL_IP}"
 
     environment:
-      - node.name=es.nginx.rocks
-      - discovery.seed_hosts=es.nginx.rocks
-      - cluster.initial_master_nodes=es.nginx.rocks
-      - ELASTIC_PASSWORD=yourpasswordhere
+      - node.name=es.${DOMAIN_NAME}
+      - discovery.seed_hosts=es.${DOMAIN_NAME}
+      - cluster.initial_master_nodes=es.${DOMAIN_NAME}
+      - ELASTIC_PASSWORD=${PASSWORD}
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
       - xpack.license.self_generated.type=trial
       - xpack.security.enabled=true
@@ -80,9 +84,5 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-  wait_until_ready:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.11.1
-    command: /usr/bin/true
-    depends_on: {"elasticsearch": {"condition": "service_healthy"}}
 
 volumes: {"elk-data"}
