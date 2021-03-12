@@ -15,8 +15,8 @@ services:
   nginx-app-protect:
     container_name: nginx-app-protect
     # if you already have a built image, save time and use it instead
-    image: registry.nginx.rocks/nap:test
-    #uild: nginx-app-protect
+    # image: registry.domain.com/nginx-app-protect:latest
+    build: nginx-app-protect
     ports:
       - "80:80"
       - "443:443"
