@@ -9,13 +9,11 @@ The NGINX instance will log all availible variables (from here: <http://nginx.or
 * Update .env file with your values
 * The app-protect host is listening on 80 and 443 automatically redirects to kibana and logs that traffic to elasticsearch
 * Either copy your nginx-repo keys to the nginx-app-protect dir or change the build to your existing image in docker-compose.yml
-* I included certificates to *.nginx.rocks, feel free to replace them with your own.
 * Certificates to nginx.rocks are included, feel free to replace them with your own
-* Bring up with `run.sh`
+* Bring up with `./run.sh`
 * The default login is elastic/yourpasswordhere
 * Import the Kibana Dashboards file if desired, instructions below
 * Turn on dark mode in Stack Management>Advanced Settings*
-
 
 This is essentially a fork of the F5 Dev Central version, I just removed logstash and using Fluentd.
 
