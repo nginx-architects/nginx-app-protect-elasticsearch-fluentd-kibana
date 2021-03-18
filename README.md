@@ -22,6 +22,8 @@ If these dashboards are updated (I copied as of Mar 10, 2021), they should still
 
 ## Dashboards Installation
 Import dashboards to kibana through UI (Kibana->Management->Saved Objects) or use API calls below.
+![Dashboard Example](screenshot.png)
+
 ```
 source .env && curl -F "file=@kibana-indexes-dashboards.ndjson" \
     -X POST -u elastic:$PASSWORD -H "kbn-xsrf: true" \
@@ -29,4 +31,32 @@ source .env && curl -F "file=@kibana-indexes-dashboards.ndjson" \
     https://es.$DOMAIN_NAME:5601/api/saved_objects/_import?createNewCopies=false&overwrite=true
 ```
 
+### Running Attack Exploits
+
+> Basic Browser based exploits
+> Localhost examples
+
+```c
+curl http://localhost/index.html
+curl http://localhost/?a=%3Cscript%3E
+curl http://localhost/basic/index.php
+curl http://localhost/file.exe
+curl http://localhost/%09
+curl http://localhost//?a=%3Cscript%3E
+```
+
+Additonal Attacks:
+
+> xss attacks from a search field.
+
+```c
+<iframe src="javascript:alert(`xss`)">
+
+<iframe width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/771984076&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true"></iframe>.
+
+' OR true--
+```
+
 *=Unless you really like the glare
+
+## Big thanks to Doug Turner for the collaboration!
